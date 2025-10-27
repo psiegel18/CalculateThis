@@ -96,8 +96,8 @@ struct ContentView: View {
                     .padding(.bottom, .Spacing.large)
                 }
             }
-            .background(Color(UIColor.systemGroupedBackground))
-            .navigationBarHidden(true)
+            .background(Color(NSColor.controlBackgroundColor))
+            .navigationTitle("")
         }
         .navigationViewStyleCompat()
     }

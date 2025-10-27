@@ -179,7 +179,7 @@ struct AgeCalculator: View {
             }
             .padding(.Spacing.large)
         }
-        .background(Color(UIColor.systemGroupedBackground))
+        .background(Color(.systemGroupedBackground))
         .navigationTitle("Age Calculator")
         .navigationBarTitleDisplayModeCompat(.inline)
     }

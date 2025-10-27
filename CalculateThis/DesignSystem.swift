@@ -6,6 +6,11 @@
 //
 
 import SwiftUI
+#if canImport(UIKit)
+import UIKit
+#elseif canImport(AppKit)
+import AppKit
+#endif
 
 // MARK: - Colors
 extension Color {
@@ -33,14 +38,28 @@ extension Color {
         static let infoLight = Color.blue.opacity(0.1)
 
         // Neutral Colors
-        static let cardBackground = Color.systemGray6
+        static let cardBackground = Color(systemGray6)
+        #if canImport(UIKit)
         static let secondaryBackground = Color(UIColor.secondarySystemBackground)
         static let tertiaryBackground = Color(UIColor.tertiarySystemBackground)
+        #elseif canImport(AppKit)
+        static let secondaryBackground = Color(NSColor.controlBackgroundColor)
+        static let tertiaryBackground = Color(NSColor.tertiarySystemFill)
+        #else
+        static let secondaryBackground = Color.gray.opacity(0.1)
+        static let tertiaryBackground = Color.gray.opacity(0.05)
+        #endif
 
         // Text Colors
         static let textPrimary = Color.primary
         static let textSecondary = Color.secondary
+        #if canImport(UIKit)
         static let textTertiary = Color(UIColor.tertiaryLabel)
+        #elseif canImport(AppKit)
+        static let textTertiary = Color(NSColor.tertiaryLabelColor)
+        #else
+        static let textTertiary = Color.gray
+        #endif
 
         // Category Colors
         static let calculator1 = Color.blue
