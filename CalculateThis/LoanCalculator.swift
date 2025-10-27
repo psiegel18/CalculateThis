@@ -1,29 +1,27 @@
 import SwiftUI
 
-import SwiftUI
-
 struct LoanCalculator: View {
     @State private var loanAmount = ""
     @State private var interestRate = ""
     @State private var loanTerm = ""
     @State private var termUnit = 0 // 0 = years, 1 = months
-    
+
     var monthlyPayment: Double {
         let principal = Double(loanAmount) ?? 0
         let rate = (Double(interestRate) ?? 0) / 100 / 12
         let months = termUnit == 0 ? (Double(loanTerm) ?? 0) * 12 : (Double(loanTerm) ?? 0)
-        
+
         guard principal > 0, rate > 0, months > 0 else { return 0 }
-        
+
         let payment = principal * (rate * pow(1 + rate, months)) / (pow(1 + rate, months) - 1)
         return payment
     }
-    
+
     var totalPayment: Double {
         let months = termUnit == 0 ? (Double(loanTerm) ?? 0) * 12 : (Double(loanTerm) ?? 0)
         return monthlyPayment * months
     }
-    
+
     var totalInterest: Double {
         let principal = Double(loanAmount) ?? 0
         return totalPayment - principal
@@ -31,152 +29,191 @@ struct LoanCalculator: View {
     
     var body: some View {
         ScrollView {
-            VStack(spacing: 25) {
+            VStack(spacing: .Spacing.large) {
                 // Loan Amount
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("Loan Amount")
-                        .font(.headline)
-                    
-                    HStack {
-                        Text("$")
-                            .font(.title2)
-                            .foregroundColor(.secondary)
-                        TextField("0", text: $loanAmount)
-                            .keyboardTypeCompat(.decimalPad)
-                            .font(.title2)
-                    }
-                    .padding()
-                    .background(Color.systemGray6)
-                    .cornerRadius(10)
-                }
-                
-                // Interest Rate
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("Annual Interest Rate")
-                        .font(.headline)
-                    
-                    HStack {
-                        TextField("0", text: $interestRate)
-                            .keyboardTypeCompat(.decimalPad)
-                            .font(.title2)
-                        Text("%")
-                            .font(.title2)
-                            .foregroundColor(.secondary)
-                    }
-                    .padding()
-                    .background(Color.systemGray6)
-                    .cornerRadius(10)
-                }
-                
-                // Loan Term
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("Loan Term")
-                        .font(.headline)
-                    
-                    HStack(spacing: 10) {
-                        TextField("0", text: $loanTerm)
-                            .keyboardTypeCompat(.numberPad)
-                            .font(.title2)
-                            .padding()
-                            .background(Color.systemGray6)
-                            .cornerRadius(10)
-                        
-                        Picker("", selection: $termUnit) {
-                            Text("Years").tag(0)
-                            Text("Months").tag(1)
+                CardContainer {
+                    VStack(alignment: .leading, spacing: .Spacing.medium) {
+                        HStack {
+                            Image(systemName: "banknote.fill")
+                                .font(.system(size: IconConfig.mediumSize))
+                                .foregroundColor(.Theme.calculator4)
+                            Text("Loan Amount")
+                                .font(.Theme.titleMedium)
+                                .fontWeight(.semibold)
                         }
-                        .pickerStyle(SegmentedPickerStyle())
-                        .frame(width: 150)
+
+                        HStack(spacing: .Spacing.small) {
+                            Text("$")
+                                .font(.Theme.displaySmall)
+                                .foregroundColor(.Theme.textSecondary)
+
+                            TextField("25000", text: $loanAmount)
+                                .keyboardTypeCompat(.decimalPad)
+                                .font(.Theme.displaySmall)
+                                .fontWeight(.bold)
+                        }
+                        .padding(.Spacing.medium)
+                        .background(Color.Theme.secondaryBackground)
+                        .cornerRadius(.CornerRadius.medium)
                     }
                 }
-                
+
+                // Interest Rate
+                CardContainer {
+                    VStack(alignment: .leading, spacing: .Spacing.medium) {
+                        HStack {
+                            Image(systemName: "percent")
+                                .font(.system(size: IconConfig.mediumSize))
+                                .foregroundColor(.Theme.calculator4)
+                            Text("Annual Interest Rate")
+                                .font(.Theme.titleMedium)
+                                .fontWeight(.semibold)
+                        }
+
+                        HStack(spacing: .Spacing.small) {
+                            TextField("5.5", text: $interestRate)
+                                .keyboardTypeCompat(.decimalPad)
+                                .font(.Theme.displaySmall)
+                                .fontWeight(.bold)
+
+                            Text("%")
+                                .font(.Theme.titleLarge)
+                                .foregroundColor(.Theme.textSecondary)
+                        }
+                        .padding(.Spacing.medium)
+                        .background(Color.Theme.secondaryBackground)
+                        .cornerRadius(.CornerRadius.medium)
+                    }
+                }
+
+                // Loan Term
+                CardContainer {
+                    VStack(alignment: .leading, spacing: .Spacing.medium) {
+                        HStack {
+                            Image(systemName: "calendar")
+                                .font(.system(size: IconConfig.mediumSize))
+                                .foregroundColor(.Theme.calculator4)
+                            Text("Loan Term")
+                                .font(.Theme.titleMedium)
+                                .fontWeight(.semibold)
+                        }
+
+                        VStack(spacing: .Spacing.small) {
+                            TextField("5", text: $loanTerm)
+                                .keyboardTypeCompat(.numberPad)
+                                .font(.Theme.displaySmall)
+                                .fontWeight(.bold)
+                                .padding(.Spacing.medium)
+                                .background(Color.Theme.secondaryBackground)
+                                .cornerRadius(.CornerRadius.medium)
+
+                            Picker("", selection: $termUnit) {
+                                Text("Years").tag(0)
+                                Text("Months").tag(1)
+                            }
+                            .pickerStyle(SegmentedPickerStyle())
+                        }
+                    }
+                }
+
                 // Results
                 if monthlyPayment > 0 {
-                    VStack(spacing: 20) {
-                        // Monthly Payment (Primary)
-                        VStack(spacing: 8) {
-                            Text("Monthly Payment")
-                                .font(.headline)
-                                .foregroundColor(.secondary)
-                            
-                            Text("$\(String(format: "%.2f", monthlyPayment))")
-                                .font(.system(size: 48, weight: .bold))
-                                .foregroundColor(.blue)
-                        }
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(Color.blue.opacity(0.1))
-                        .cornerRadius(15)
-                        
-                        // Additional Details
-                        VStack(spacing: 15) {
-                            DetailRow(
+                    PrimaryResultCard(
+                        title: "Monthly Payment",
+                        value: "$\(String(format: "%.2f", monthlyPayment))",
+                        subtitle: "Due each month",
+                        color: .Theme.calculator4
+                    )
+
+                    // Additional Details
+                    CardContainer {
+                        VStack(spacing: .Spacing.medium) {
+                            InfoRow(
                                 label: "Total Amount Paid",
-                                value: "$\(String(format: "%.2f", totalPayment))"
+                                value: "$\(String(format: "%.2f", totalPayment))",
+                                icon: "sum"
                             )
-                            
-                            Divider()
-                            
-                            DetailRow(
+
+                            ThemedDivider()
+
+                            InfoRow(
                                 label: "Total Interest",
                                 value: "$\(String(format: "%.2f", totalInterest))",
-                                valueColor: .orange
+                                icon: "chart.line.uptrend.xyaxis"
                             )
-                            
-                            Divider()
-                            
-                            DetailRow(
+
+                            ThemedDivider()
+
+                            InfoRow(
                                 label: "Principal",
-                                value: "$\(String(format: "%.2f", Double(loanAmount) ?? 0))"
+                                value: "$\(String(format: "%.2f", Double(loanAmount) ?? 0))",
+                                icon: "dollarsign.circle"
                             )
                         }
-                        .padding()
-                        .background(Color.systemGray6)
-                        .cornerRadius(12)
-                        
-                        // Breakdown
-                        VStack(alignment: .leading, spacing: 10) {
-                            Text("Payment Breakdown")
-                                .font(.headline)
-                            
+                    }
+
+                    // Breakdown
+                    CardContainer {
+                        VStack(alignment: .leading, spacing: .Spacing.medium) {
+                            HStack {
+                                Image(systemName: "chart.pie.fill")
+                                    .font(.system(size: IconConfig.mediumSize))
+                                    .foregroundColor(.Theme.calculator4)
+                                Text("Payment Breakdown")
+                                    .font(.Theme.titleMedium)
+                                    .fontWeight(.semibold)
+                            }
+
                             let principal = Double(loanAmount) ?? 0
                             let interestPercent = (totalInterest / totalPayment) * 100
                             let principalPercent = (principal / totalPayment) * 100
-                            
+
                             GeometryReader { geometry in
                                 HStack(spacing: 0) {
                                     Rectangle()
-                                        .fill(Color.blue)
+                                        .fill(Color.Theme.calculator4)
                                         .frame(width: geometry.size.width * (principalPercent / 100))
-                                    
+
                                     Rectangle()
-                                        .fill(Color.orange)
+                                        .fill(Color.Theme.calculator4.opacity(0.5))
                                         .frame(width: geometry.size.width * (interestPercent / 100))
                                 }
                             }
-                            .frame(height: 30)
-                            .cornerRadius(8)
-                            
-                            HStack {
-                                Label("Principal (\(String(format: "%.1f", principalPercent))%)", systemImage: "circle.fill")
-                                    .foregroundColor(.blue)
-                                    .font(.caption)
-                                
-                                Spacer()
-                                
-                                Label("Interest (\(String(format: "%.1f", interestPercent))%)", systemImage: "circle.fill")
-                                    .foregroundColor(.orange)
-                                    .font(.caption)
+                            .frame(height: 40)
+                            .cornerRadius(.CornerRadius.small)
+
+                            VStack(spacing: .Spacing.small) {
+                                HStack {
+                                    Circle()
+                                        .fill(Color.Theme.calculator4)
+                                        .frame(width: 12, height: 12)
+                                    Text("Principal")
+                                        .font(.Theme.bodyMedium)
+                                    Spacer()
+                                    Text("\(String(format: "%.1f", principalPercent))%")
+                                        .font(.Theme.bodyMedium)
+                                        .fontWeight(.semibold)
+                                }
+
+                                HStack {
+                                    Circle()
+                                        .fill(Color.Theme.calculator4.opacity(0.5))
+                                        .frame(width: 12, height: 12)
+                                    Text("Interest")
+                                        .font(.Theme.bodyMedium)
+                                    Spacer()
+                                    Text("\(String(format: "%.1f", interestPercent))%")
+                                        .font(.Theme.bodyMedium)
+                                        .fontWeight(.semibold)
+                                }
                             }
                         }
-                        .padding()
-                        .background(Color.systemGray6)
-                        .cornerRadius(12)
                     }
                 }
             }
-            .padding()
+            .padding(.Spacing.large)
         }
+        .background(Color(UIColor.systemGroupedBackground))
         .navigationTitle("Loan Calculator")
         .navigationBarTitleDisplayModeCompat(.inline)
     }

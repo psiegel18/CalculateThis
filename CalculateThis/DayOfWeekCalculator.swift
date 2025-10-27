@@ -1,3 +1,8 @@
+//
+//  DayOfWeekCalculator.swift
+//  CalculateThis
+//
+
 import SwiftUI
 
 struct DayOfWeekCalculator: View {
@@ -5,119 +10,146 @@ struct DayOfWeekCalculator: View {
     @State private var showCalculation = false
     @State private var calculationSteps: [String] = []
     @State private var resultDayOfWeek = ""
-    
+
     var body: some View {
         ScrollView {
-            VStack(spacing: 20) {
+            VStack(spacing: .Spacing.large) {
                 // Date Picker
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("Select a Date")
-                        .font(.headline)
-                    
-                    DatePicker("", selection: $selectedDate, displayedComponents: .date)
-                        .datePickerStyle(.graphical)
-                        .onChange(of: selectedDate) {
-                            showCalculation = false
+                CardContainer {
+                    VStack(alignment: .leading, spacing: .Spacing.medium) {
+                        HStack {
+                            Image(systemName: "calendar.badge.clock")
+                                .font(.system(size: IconConfig.mediumSize))
+                                .foregroundColor(.Theme.calculator1)
+                            Text("Select a Date")
+                                .font(.Theme.titleMedium)
+                                .fontWeight(.semibold)
                         }
+
+                        DatePicker("", selection: $selectedDate, displayedComponents: .date)
+                            .datePickerStyle(.graphical)
+                            .onChange(of: selectedDate) {
+                                showCalculation = false
+                            }
+                    }
                 }
-                .padding()
-                .background(Color.systemGray6)
-                .cornerRadius(12)
-                
+
                 // Calculate Button
-                Button(action: calculateDayOfWeek) {
-                    Text("Calculate Day of Week")
-                        .font(.headline)
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.blue)
-                        .cornerRadius(10)
+                Button(action: {
+                    withAnimation(.theme) {
+                        calculateDayOfWeek()
+                    }
+                }) {
+                    HStack {
+                        Image(systemName: "sparkles")
+                        Text("Calculate Day of Week")
+                            .fontWeight(.semibold)
+                    }
                 }
-                
+                .primaryButtonStyle()
+
                 // Result Display
                 if showCalculation {
-                    VStack(spacing: 15) {
-                        Text("Result")
-                            .font(.title2)
-                            .fontWeight(.bold)
-                        
-                        Text(resultDayOfWeek)
-                            .font(.system(size: 32, weight: .bold))
-                            .foregroundColor(.blue)
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(Color.blue.opacity(0.1))
-                            .cornerRadius(10)
-                        
+                    VStack(spacing: .Spacing.large) {
+                        PrimaryResultCard(
+                            title: "Day of the Week",
+                            value: resultDayOfWeek,
+                            subtitle: selectedDate.formatted(date: .long, time: .omitted),
+                            color: .Theme.calculator1
+                        )
+
                         // Calculation Steps
-                        VStack(alignment: .leading, spacing: 10) {
-                            Text("Calculation Steps (Doomsday Algorithm)")
-                                .font(.headline)
-                                .padding(.bottom, 5)
-                            
-                            ForEach(calculationSteps.indices, id: \.self) { index in
-                                HStack(alignment: .top, spacing: 10) {
-                                    Text("\(index + 1).")
+                        CardContainer {
+                            VStack(alignment: .leading, spacing: .Spacing.medium) {
+                                HStack {
+                                    Image(systemName: "function")
+                                        .font(.system(size: IconConfig.mediumSize))
+                                        .foregroundColor(.Theme.calculator1)
+                                    Text("Calculation Steps")
+                                        .font(.Theme.titleMedium)
                                         .fontWeight(.semibold)
-                                        .foregroundColor(.blue)
-                                    Text(calculationSteps[index])
-                                        .font(.system(.body, design: .monospaced))
                                 }
-                                .padding(.vertical, 5)
+
+                                Text("Doomsday Algorithm")
+                                    .font(.Theme.labelMedium)
+                                    .foregroundColor(.Theme.textSecondary)
+
+                                VStack(alignment: .leading, spacing: .Spacing.small) {
+                                    ForEach(calculationSteps.indices, id: \.self) { index in
+                                        HStack(alignment: .top, spacing: .Spacing.small) {
+                                            Text("\(index + 1).")
+                                                .font(.Theme.monoMedium)
+                                                .fontWeight(.semibold)
+                                                .foregroundColor(.Theme.calculator1)
+                                                .frame(width: 28, alignment: .trailing)
+
+                                            Text(calculationSteps[index])
+                                                .font(.Theme.monoMedium)
+                                                .foregroundColor(.Theme.textPrimary)
+                                                .frame(maxWidth: .infinity, alignment: .leading)
+                                        }
+                                        .padding(.vertical, .Spacing.xxsmall)
+
+                                        if index < calculationSteps.count - 1 {
+                                            Divider()
+                                                .padding(.leading, 36)
+                                        }
+                                    }
+                                }
+                                .padding(.Spacing.small)
+                                .background(Color.Theme.calculator1.opacity(0.05))
+                                .cornerRadius(.CornerRadius.small)
                             }
                         }
-                        .padding()
-                        .background(Color.systemGray6)
-                        .cornerRadius(12)
                     }
                 }
             }
-            .padding()
+            .padding(.Spacing.large)
         }
+        .background(Color(UIColor.systemGroupedBackground))
         .navigationTitle("Day of Week")
         .navigationBarTitleDisplayModeCompat(.inline)
     }
-    
+
     func calculateDayOfWeek() {
         calculationSteps.removeAll()
-        
+
         let calendar = Calendar.current
         let components = calendar.dateComponents([.year, .month, .day], from: selectedDate)
-        
+
         guard let year = components.year,
               let month = components.month,
               let day = components.day else { return }
-        
+
         // Step 1: Calculate Century Code
         let centuryCode = getCenturyCode(year: year)
         let baseYear = (year / 100) * 100
         calculationSteps.append("Century Code for \(baseYear)s: \(centuryCode)")
-        
+
         // Step 2: Calculate year components
         let xxYear = year % 100
         let xxYearQuotient = xxYear / 12
         let xxYearRemainder = xxYear % 12
         calculationSteps.append("Last 2 digits: \(xxYear) ÷ 12 = \(xxYearQuotient) R \(xxYearRemainder)")
-        
+
         // Step 3: Divide remainder by 4
         let xxYearRemDiv4Quotient = xxYearRemainder / 4
         let xxYearRemDiv4Remainder = xxYearRemainder % 4
         calculationSteps.append("Remainder ÷ 4: \(xxYearRemainder) ÷ 4 = \(xxYearRemDiv4Quotient) R \(xxYearRemDiv4Remainder)")
-        
+
         // Step 4: Get month's doomsday
         let monthDoomsday = getDoomsday(month: month, year: year)
         let monthName = calendar.monthSymbols[month - 1]
         calculationSteps.append("\(monthName)'s Doomsday: \(monthDoomsday)")
-        
+
         // Step 5: Calculate user doomsday
         let userDoomsday = day - monthDoomsday
         calculationSteps.append("User Doomsday: \(day) - \(monthDoomsday) = \(userDoomsday)")
-        
+
         // Step 6: Sum all values
         let totalResult = centuryCode + xxYearQuotient + xxYearRemainder + xxYearRemDiv4Quotient + userDoomsday
         calculationSteps.append("Total: \(centuryCode) + \(xxYearQuotient) + \(xxYearRemainder) + \(xxYearRemDiv4Quotient) + \(userDoomsday) = \(totalResult)")
-        
+
         // Step 7: Get remainder when dividing by 7
         var weekDate = totalResult % 7
         if weekDate < 0 {
@@ -126,19 +158,19 @@ struct DayOfWeekCalculator: View {
         } else {
             calculationSteps.append("Final: \(totalResult) mod 7 = \(weekDate)")
         }
-        
+
         // Get day name
         let weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
         resultDayOfWeek = weekdays[weekDate]
-        
+
         let formatter = DateFormatter()
         formatter.dateFormat = "MMMM d, yyyy"
         let dateString = formatter.string(from: selectedDate)
         calculationSteps.append("\(dateString) was a \(resultDayOfWeek)!")
-        
+
         showCalculation = true
     }
-    
+
     func getCenturyCode(year: Int) -> Int {
         let centuries: [(range: ClosedRange<Int>, code: Int)] = [
             (1...99, 2), (100...199, 0), (200...299, 5), (300...399, 3),
@@ -150,7 +182,7 @@ struct DayOfWeekCalculator: View {
             (2400...2499, 2), (2500...2599, 0), (2600...2699, 5), (2700...2799, 3),
             (2800...2899, 2), (2900...2999, 0), (3000...3099, 5), (3100...3199, 3)
         ]
-        
+
         for century in centuries {
             if century.range.contains(year) {
                 return century.code
@@ -158,10 +190,10 @@ struct DayOfWeekCalculator: View {
         }
         return 0
     }
-    
+
     func getDoomsday(month: Int, year: Int) -> Int {
         let isLeapYear = (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)
-        
+
         switch month {
         case 1: return isLeapYear ? 4 : 3      // January
         case 2: return isLeapYear ? 29 : 28    // February
