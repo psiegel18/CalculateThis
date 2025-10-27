@@ -54,13 +54,13 @@ struct BMICalculator: View {
                     
                     HStack {
                         TextField(useMetric ? "kg" : "lbs", text: $weight)
-                            .keyboardType(.decimalPad)
+                            .keyboardTypeCompat(.decimalPad)
                             .font(.title2)
                         Text(useMetric ? "kg" : "lbs")
                             .foregroundColor(.secondary)
                     }
                     .padding()
-                    .background(Color(.systemGray6))
+                    .background(Color.systemGray6)
                     .cornerRadius(10)
                 }
                 
@@ -71,13 +71,13 @@ struct BMICalculator: View {
                     
                     HStack {
                         TextField(useMetric ? "cm" : "inches", text: $height)
-                            .keyboardType(.decimalPad)
+                            .keyboardTypeCompat(.decimalPad)
                             .font(.title2)
                         Text(useMetric ? "cm" : "in")
                             .foregroundColor(.secondary)
                     }
                     .padding()
-                    .background(Color(.systemGray6))
+                    .background(Color.systemGray6)
                     .cornerRadius(10)
                 }
                 
@@ -114,17 +114,17 @@ struct BMICalculator: View {
                         BMIScaleRow(label: "Underweight", range: "< 18.5", color: .blue)
                         BMIScaleRow(label: "Normal", range: "18.5 - 24.9", color: .green)
                         BMIScaleRow(label: "Overweight", range: "25 - 29.9", color: .orange)
-                        BMIScaleRow(label: "Obese", range: "≥ 30", range: .red)
+                        BMIScaleRow(label: "Obese", range: "≥ 30", color: .red)
                     }
                     .padding()
-                    .background(Color(.systemGray6))
+                    .background(Color.systemGray6)
                     .cornerRadius(12)
                 }
             }
             .padding()
         }
         .navigationTitle("BMI Calculator")
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarTitleDisplayModeCompat(.inline)
     }
 }
 

@@ -16,12 +16,12 @@ struct DayOfWeekCalculator: View {
                     
                     DatePicker("", selection: $selectedDate, displayedComponents: .date)
                         .datePickerStyle(.graphical)
-                        .onChange(of: selectedDate) { _ in
+                        .onChange(of: selectedDate) {
                             showCalculation = false
                         }
                 }
                 .padding()
-                .background(Color(.systemGray6))
+                .background(Color.systemGray6)
                 .cornerRadius(12)
                 
                 // Calculate Button
@@ -68,7 +68,7 @@ struct DayOfWeekCalculator: View {
                             }
                         }
                         .padding()
-                        .background(Color(.systemGray6))
+                        .background(Color.systemGray6)
                         .cornerRadius(12)
                     }
                 }
@@ -76,7 +76,7 @@ struct DayOfWeekCalculator: View {
             .padding()
         }
         .navigationTitle("Day of Week")
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarTitleDisplayModeCompat(.inline)
     }
     
     func calculateDayOfWeek() {

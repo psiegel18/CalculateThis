@@ -1,5 +1,11 @@
 import SwiftUI
 
+#if os(iOS)
+import UIKit
+#elseif os(macOS)
+import AppKit
+#endif
+
 // MARK: - Cross-Platform Extensions
 
 extension Color {
@@ -23,7 +29,14 @@ extension View {
     
     func navigationBarTitleDisplayModeCompat(_ mode: NavigationBarTitleDisplayMode) -> some View {
         #if os(iOS)
-        return self.navigationBarTitleDisplayMode(mode.uiKitMode)
+        switch mode {
+        case .automatic:
+            return self.navigationBarTitleDisplayMode(.automatic)
+        case .inline:
+            return self.navigationBarTitleDisplayMode(.inline)
+        case .large:
+            return self.navigationBarTitleDisplayMode(.large)
+        }
         #else
         return self
         #endif
@@ -64,11 +77,11 @@ enum NavigationBarTitleDisplayMode {
     case large
     
     #if os(iOS)
-    var uiKitMode: SwiftUI.NavigationBarTitleDisplayMode {
+    var uiKitMode: UINavigationItem.LargeTitleDisplayMode {
         switch self {
         case .automatic: return .automatic
-        case .inline: return .inline
-        case .large: return .large
+        case .inline: return .never
+        case .large: return .always
         }
     }
     #endif
